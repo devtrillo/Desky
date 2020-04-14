@@ -1,0 +1,60 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<input type="number" name="red" id="red" value="0" aria-valuemax="255" aria-valuemin="0">
+<input type="number" name="green" id="green" value="0" aria-valuemax="255" aria-valuemin="0">
+<input type="number" name="blue" id="blue" value="0" aria-valuemax="255" aria-valuemin="0">
+<button id="sendData">Send Data</button>
+<button id="setRainbow">setRainbow</button>
+
+<body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+        integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+        var socket = io('http://192.168.15.8:5000');
+        socket.on('connect', function () {
+            console.log('Connected')
+            socket.on('light', (data) => {
+                console.log('data', data)
+            })
+        });
+        const parseValue = (value) => parseInt(value) % 256
+        const button = document.getElementById('sendData')
+        const rainbowButton = document.getElementById('setRainbow')
+        rainbowButton.addEventListener('click', () => {
+            const data = {
+                method: 'rainbow',
+                red: 0,
+                green: 0,
+                blue: 0
+            }
+            console.log(data);
+
+            socket.emit('light', {
+                data
+            });
+        })
+        button.addEventListener('click', () => {
+            const redElement = document.getElementById('red')
+            const greenElement = document.getElementById('green')
+            const blueElement = document.getElementById('blue')
+            const data = {
+                method: 'color_fill',
+                red: parseValue(redElement.value),
+                green: parseValue(greenElement.value),
+                blue: parseValue(blueElement.value),
+            }
+
+            socket.emit('light', {
+                data
+            });
+        })
+    </script>
+</body>
+
+</html>
